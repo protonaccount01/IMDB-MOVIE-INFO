@@ -1,10 +1,10 @@
 import os
 import json
 from flask import Flask, request
-from PyMovieDb import IMDB
+from imdb import Cinemagoer
 
 server = Flask(__name__)
-imdb = IMDB()
+ia = Cinemagoer()
 
 @server.route('/movie', methods=['GET'])
 def movie_api():
@@ -13,23 +13,24 @@ def movie_api():
         return json.dumps({"status": "error", "message": "name parameter missing"}), 400
     
     try:
-        # IMDb থেকে র ডাটা নেওয়া
-        res = imdb.get_by_name(movie_name)
-        data = json.loads(res)
+        # মুভি সার্চ করা
+        search = ia.search_movie(movie_name)
+        if not search:
+            return json.dumps({"status": "error", "message": "not found"}), 404
+        
+        # প্রথম রেজাল্টটি নেওয়া এবং বিস্তারিত তথ্য বের করা
+        movie_id = search[0].movieID
+        movie = ia.get_movie(movie_id)
 
-        # ডাটা চেক করা
-        if not data or "name" not in data:
-             return json.dumps({"status": "error", "message": "not found"}), 404
-             
         response = {
             "status": "success",
-            "title": data.get("name"),
-            "year": data.get("datePublished"),
-            "rating": data.get("aggregateRating", {}).get("ratingValue") if data.get("aggregateRating") else "N/A",
-            "description": data.get("description"),
-            "genre": data.get("genre"),
-            "poster": data.get("image"),
-            "actors": [a.get("name") for a in data.get("actor", [])] if data.get("actor") else []
+            "title": movie.get('title'),
+            "year": movie.get('year'),
+            "rating": movie.get('rating', 'N/A'),
+            "description": movie.get('plot outline', movie.get('plot', ['No plot available'])[0]),
+            "genre": movie.get('genres', []),
+            "poster": movie.get('full-size cover url'),
+            "actors": [person['name'] for person in movie.get('cast', [])[:5]]
         }
         return json.dumps(response), 200
 
