@@ -1,161 +1,30 @@
 <!DOCTYPE html>
-<html lang="bn">
+<html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Web IPTV Player</title>
-    <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
-    <style>
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #121212;
-            color: #ffffff;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            min-height: 100vh;
-            padding: 20px;
-        }
-        .header {
-            margin-bottom: 20px;
-            text-align: center;
-        }
-        .header h1 {
-            color: #00e676;
-            margin-bottom: 5px;
-        }
-        .input-container {
-            display: flex;
-            width: 100%;
-            max-width: 800px;
-            margin-bottom: 20px;
-            gap: 10px;
-        }
-        input[type="text"] {
-            flex-grow: 1;
-            padding: 12px;
-            border: none;
-            border-radius: 5px;
-            background-color: #2c2c2c;
-            color: #fff;
-            font-size: 16px;
-            outline: none;
-        }
-        input[type="text"]:focus {
-            box-shadow: 0 0 0 2px #00e676;
-        }
-        button {
-            padding: 12px 24px;
-            background-color: #00e676;
-            color: #000;
-            border: none;
-            border-radius: 5px;
-            font-size: 16px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: background-color 0.3s ease;
-        }
-        button:hover {
-            background-color: #00c853;
-        }
-        .video-container {
-            width: 100%;
-            max-width: 800px;
-            background-color: #000;
-            border-radius: 10px;
-            overflow: hidden;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
-        }
-        video {
-            width: 100%;
-            display: block;
-        }
-        .error-message {
-            color: #ff5252;
-            margin-top: 10px;
-            text-align: center;
-            display: none;
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Plus Web Bot Client</title>
+<link rel="stylesheet" href="style.css">
 </head>
 <body>
-
-    <div class="header">
-        <h1>Web IPTV Player</h1>
-        <p>যেকোনো .m3u8 লিংক পেস্ট করে প্লে করুন</p>
-    </div>
-
-    <div class="input-container">
-        <input type="text" id="streamUrl" placeholder="এখানে .m3u8 লিংক পেস্ট করুন..." value="https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8">
-        <button onclick="playStream()">Play</button>
-    </div>
-
-    <div class="video-container">
-        <video id="videoPlayer" controls></video>
-    </div>
-    
-    <div id="errorMsg" class="error-message">লিংকটি প্লে করা যাচ্ছে না অথবা এটি ইনভ্যালিড।</div>
-
-    <script>
-        const video = document.getElementById('videoPlayer');
-        const errorMsg = document.getElementById('errorMsg');
-        let hls;
-
-        function playStream() {
-            const url = document.getElementById('streamUrl').value.trim();
-            errorMsg.style.display = 'none';
-
-            if (!url) {
-                alert("দয়া করে একটি লিংক দিন!");
-                return;
-            }
-
-            // যদি আগের কোনো HLS instance থাকে, তা ডিলিট করা
-            if (hls) {
-                hls.destroy();
-            }
-
-            // ব্রাউজার HLS.js সাপোর্ট করে কিনা চেক করা
-            if (Hls.isSupported()) {
-                hls = new Hls();
-                hls.loadSource(url);
-                hls.attachMedia(video);
-                hls.on(Hls.Events.MANIFEST_PARSED, function() {
-                    video.play().catch(() => {
-                        console.log("Auto-play prevented by browser.");
-                    });
-                });
-                hls.on(Hls.Events.ERROR, function(event, data) {
-                    if (data.fatal) {
-                        errorMsg.style.display = 'block';
-                        errorMsg.innerText = "স্ট্রিমিংয়ে সমস্যা হচ্ছে (CORS বা ইনভ্যালিড লিংক)।";
-                    }
-                });
-            } 
-            // সাফারি (Safari) ব্রাউজারের জন্য, যা ন্যাটিভভাবে m3u8 সাপোর্ট করে
-            else if (video.canPlayType('application/vnd.apple.mpegurl')) {
-                video.src = url;
-                video.addEventListener('loadedmetadata', function() {
-                    video.play();
-                });
-                video.addEventListener('error', function() {
-                    errorMsg.style.display = 'block';
-                });
-            } else {
-                errorMsg.style.display = 'block';
-                errorMsg.innerText = "আপনার ব্রাউজার HLS স্ট্রিমিং সাপোর্ট করে না।";
-            }
-        }
-
-        // পেজ লোড হওয়ার সাথে সাথে ডিফল্ট ভিডিও প্লে করার জন্য (ঐচ্ছিক)
-        // window.onload = playStream;
-    </script>
-
+<div id="login-screen">
+<h2>Bot Log in</h2>
+<input type="text" id="bot-token" placeholder="Enter bot token">
+<button id="login-btn">OK</button>
+</div>
+<div id="chat-screen" style="display: none;">
+<div id="sidebar">
+<div id="chat-list"></div>
+</div>
+<div id="main-chat">
+<div id="chat-header">Select a chat</div>
+<div id="message-list"></div>
+<div id="input-area">
+<input type="text" id="message-input" placeholder="Type a message">
+<button id="send-btn">Send</button>
+</div>
+</div>
+</div>
+<script src="app.js"></script>
 </body>
-    </html>
-    
+</html>
