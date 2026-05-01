@@ -98,6 +98,16 @@ display: flex;
 padding: 15px;
 background: #17212b;
 }
+#attach-btn {
+padding: 0 15px;
+background: #242f3d;
+color: white;
+border: none;
+margin-right: 10px;
+cursor: pointer;
+border-radius: 4px;
+font-size: 20px;
+}
 #message-input {
 flex: 1;
 padding: 12px;
@@ -116,4 +126,15 @@ margin-left: 10px;
 cursor: pointer;
 border-radius: 4px;
 font-weight: bold;
+}
+.file-attachment {
+display: inline-block;
+padding: 8px 12px;
+background: #242f3d;
+border-radius: 4px;
+color: #5288c1;
+text-decoration: none;
+margin-bottom: 5px;
+font-weight: bold;
+word-break: break-all;
 }
